@@ -46,8 +46,7 @@ public class BeneficiaryServiceImpl implements BeneficiaryService{
 		Wallet wallet = customer.getWallet();
 		
 		Optional<Customer> opt = customerDAO.findByMobileNo(beneficiary.getMobileNumber());
-		
-		
+	
 		if(!opt.isPresent()||!opt.get().getName().equals(beneficiary.getName())) {
 			throw new NotFoundException("Customer does not exists...");
 		}
@@ -63,8 +62,7 @@ public class BeneficiaryServiceImpl implements BeneficiaryService{
 		wallet.getBeneficiary().add(beneficiary);
 		
 		beneficiaryDAO.save(beneficiary);
-		
-		
+
 		return beneficiary.toString();
 	}
 

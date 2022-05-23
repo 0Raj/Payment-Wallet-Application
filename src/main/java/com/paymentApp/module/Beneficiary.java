@@ -29,7 +29,5 @@ public class Beneficiary {
 		this.name = name;
 		this.mobileNumber = mobileNumber;
 	}
-	
-	
-	
+
 }
