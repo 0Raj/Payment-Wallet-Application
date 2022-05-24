@@ -24,9 +24,9 @@ public class BeneficiaryController {
 //		"name":"Jay",
 //		"mobileNumber":"9981595557"
 //	}
-	@PostMapping(value = "/beneficiary")
-	public String addBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary) {
-		return beneficiaryServiceImpl.addBeneficiary(beneficiary);
+	@PostMapping(value = "/beneficiary/{key}")
+	public String addBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary, @PathVariable("key") String key) {
+		return beneficiaryServiceImpl.addBeneficiary(beneficiary, key);
 	}
 	
 //	Delete Beneficiary to from wallet by passing this object
@@ -34,22 +34,22 @@ public class BeneficiaryController {
 //	"name":"Jay",
 //	"mobileNumber":"9981595557"
 //}
-	@DeleteMapping(value = "/beneficiary")
-	public String deleteBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary) {
-		return beneficiaryServiceImpl.deleteBeneficiary(beneficiary);
+	@DeleteMapping(value = "/beneficiary/{key}")
+	public String deleteBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary, @PathVariable("key") String key) {
+		return beneficiaryServiceImpl.deleteBeneficiary(beneficiary, key);
 	}	
 	
 //	Get Beneficiary to Wallet
 //	By passing mobile number
-	@GetMapping(value = "/beneficiary")
-	public Beneficiary viewBeneficiaryInMyWallet(@PathVariable String mbilNo) {
-		return beneficiaryServiceImpl.viewBeneficiary(mbilNo);
+	@GetMapping(value = "/beneficiary/{key}")
+	public Beneficiary viewBeneficiaryInMyWallet(@PathVariable String mbilNo, @PathVariable("key") String key) {
+		return beneficiaryServiceImpl.viewBeneficiary(mbilNo, key);
 	}
 	
 //	Get All Beneficiaries to Wallet
-	@GetMapping(value = "/beneficiaries")
-	public List<Beneficiary> getAllBeneficiaryInMyWallet() {
-		return beneficiaryServiceImpl.getAllBeneficiary();
+	@GetMapping(value = "/beneficiaries/{key}")
+	public List<Beneficiary> getAllBeneficiaryInMyWallet(@PathVariable("key") String key) {
+		return beneficiaryServiceImpl.getAllBeneficiary(key);
 	}
 	
 }

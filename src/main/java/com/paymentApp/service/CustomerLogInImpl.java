@@ -1,6 +1,8 @@
 package com.paymentApp.service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import com.paymentApp.module.Customer;
 import com.paymentApp.module.CustomerDTO;
 import com.paymentApp.repository.CustomerDAO;
 import com.paymentApp.repository.SessionDAO;
+import com.paymentApp.util.GetCurrentLoginUserSessionDetails;
 
 @Service
 public class CustomerLogInImpl implements CustomerLogIn{
@@ -21,6 +24,9 @@ public class CustomerLogInImpl implements CustomerLogIn{
 	
 	@Autowired
 	private SessionDAO sessionDAO;
+	
+	@Autowired
+	private GetCurrentLoginUserSessionDetails getCurrentLoginUser;
 	
 	@Override
 	public String logIntoAccount(CustomerDTO customerDTO) {
@@ -32,15 +38,12 @@ public class CustomerLogInImpl implements CustomerLogIn{
 		}
 		Customer newCustomer = opt.get();
 		if(newCustomer.getPassword().equals(customerDTO.getPassword())) {
+			String key = UUID.randomUUID().toString();
 			
-			CurrentUserSession currentUserSession = new CurrentUserSession(); 
-			
-			currentUserSession.setCustomerId(newCustomer.getCustomerId());
-		
-			// or make it for 2 user
+			CurrentUserSession currentUserSession = new CurrentUserSession(newCustomer.getCustomerId(), key, LocalDateTime.now());			
 			sessionDAO.save(currentUserSession);
-			
-			return "Log in Sucessfull";
+
+			return currentUserSession.toString();
 		}
 		else {
 			throw new InvalidPasswordException("Please Enter Valid Password");
@@ -48,9 +51,10 @@ public class CustomerLogInImpl implements CustomerLogIn{
 	}
 
 	@Override
-	public String logOutFromAccount() {
+	public String logOutFromAccount(String key) {
 		
-		sessionDAO.deleteAll();
+		CurrentUserSession currentUserSession = getCurrentLoginUser.getCurrentUserSession(key);
+		sessionDAO.delete(currentUserSession);
 		
 		return "Logged Out...";
 	}

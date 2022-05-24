@@ -16,6 +16,7 @@ import com.paymentApp.repository.BeneficiaryDAO;
 import com.paymentApp.repository.CustomerDAO;
 import com.paymentApp.repository.SessionDAO;
 import com.paymentApp.repository.WalletDAO;
+import com.paymentApp.util.GetCurrentLoginUserSessionDetails;
 
 @Service
 public class BeneficiaryServiceImpl implements BeneficiaryService{
@@ -32,27 +33,21 @@ public class BeneficiaryServiceImpl implements BeneficiaryService{
 	@Autowired
 	private BeneficiaryDAO beneficiaryDAO;
 	
+	@Autowired
+	private GetCurrentLoginUserSessionDetails getCurrentLoginUser;
+	
+	
 	// to get wallet of customer which is currently logged in;
-	private Wallet getCurrentCustomersWallet() {
+	private Wallet getCurrentCustomersWallet(String key) {
 		
-		List<CurrentUserSession> list = sessionDAO.findAll();
-		
-		CurrentUserSession currentUserSession =  list.get(0);
-		
-		Integer id = currentUserSession.getCustomerId();
-		
-		Customer customer = customerDAO.getById(id);
-		
-		Wallet wallet = customer.getWallet();
-		
+		Wallet wallet = getCurrentLoginUser.getCurrentUserWallet(key);
 		return wallet;
-		
 	}
 	
 	@Override
-	public String addBeneficiary(Beneficiary beneficiary) throws NotFoundException , BeneficiaryAlreadyExists{
+	public String addBeneficiary(Beneficiary beneficiary, String key) throws NotFoundException , BeneficiaryAlreadyExists{
 		
-		Wallet wallet = getCurrentCustomersWallet();
+		Wallet wallet = getCurrentLoginUser.getCurrentUserWallet(key);
 		
 		Optional<Customer> opt = customerDAO.findByMobileNo(beneficiary.getMobileNumber());
 	
@@ -76,9 +71,9 @@ public class BeneficiaryServiceImpl implements BeneficiaryService{
 	}
 
 	@Override
-	public String deleteBeneficiary(Beneficiary beneficiary) throws NotFoundException {
+	public String deleteBeneficiary(Beneficiary beneficiary, String key) throws NotFoundException {
 		
-		Wallet wallet = getCurrentCustomersWallet();
+		Wallet wallet = getCurrentLoginUser.getCurrentUserWallet(key);
 		
 		List<Beneficiary> beneficiaryList = wallet.getBeneficiary();
 		
@@ -99,7 +94,7 @@ public class BeneficiaryServiceImpl implements BeneficiaryService{
 	}
 
 	@Override
-	public Beneficiary viewBeneficiary(String mobileNo) throws NotFoundException {
+	public Beneficiary viewBeneficiary(String mobileNo, String key) throws NotFoundException {
 		
 		Optional<Beneficiary> opt = beneficiaryDAO.findByMobileNumber(mobileNo);
 		
@@ -111,7 +106,7 @@ public class BeneficiaryServiceImpl implements BeneficiaryService{
 	}
 
 	@Override
-	public List<Beneficiary> getAllBeneficiary() throws NotFoundException{
+	public List<Beneficiary> getAllBeneficiary(String key) throws NotFoundException{
 		
 		List<Beneficiary> beneficiaries = beneficiaryDAO.findAll();
 		

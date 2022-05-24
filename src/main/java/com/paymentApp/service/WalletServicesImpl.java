@@ -1,7 +1,6 @@
 package com.paymentApp.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.paymentApp.exceptions.InsufficientAmountException;
 import com.paymentApp.exceptions.NotFoundException;
 import com.paymentApp.module.Bank;
-import com.paymentApp.module.CurrentUserSession;
 import com.paymentApp.module.Customer;
 import com.paymentApp.module.FundTransferDTO;
 import com.paymentApp.module.Transaction;
@@ -19,9 +17,9 @@ import com.paymentApp.module.TransactionType;
 import com.paymentApp.module.Wallet;
 import com.paymentApp.repository.BankDAO;
 import com.paymentApp.repository.CustomerDAO;
-import com.paymentApp.repository.SessionDAO;
 import com.paymentApp.repository.TransactionDAO;
 import com.paymentApp.repository.WalletDAO;
+import com.paymentApp.util.GetCurrentLoginUserSessionDetails;
 
 @Service
 public class WalletServicesImpl implements WalletService{
@@ -36,46 +34,27 @@ public class WalletServicesImpl implements WalletService{
 	private CustomerDAO customerDAO;
 	
 	@Autowired
-	private SessionDAO sessionDAO;
-	
-	@Autowired
 	private TransactionDAO transactionDAO;
 	
-// to get wallet of customer which is currently logged in;
-	private Wallet getCurrentCustomersWallet() {
-		
-		List<CurrentUserSession> list = sessionDAO.findAll();
-		
-		CurrentUserSession currentUserSession =  list.get(0);
-		
-		Integer id = currentUserSession.getCustomerId();
-		
-		Customer customer = customerDAO.getById(id);
-		
-		Wallet wallet = customer.getWallet();
-		
-		return wallet;
-		
-	}
+	@Autowired
+	private GetCurrentLoginUserSessionDetails getCurrentLoginUser;
 		
 	@Override
-	public Bank addBank(Bank bank) { 
+	public Bank addBank(Bank bank, String key) { 
 		
-		Wallet wallet = getCurrentCustomersWallet();
-		
+		Wallet wallet = getCurrentLoginUser.getCurrentUserWallet(key);
 		wallet.setBank(bank);
 		
 		bank.setWalletId(wallet.getWalletId());	
-		
 		walletDAO.save(wallet);
  		
 		return  bankDAO.save(bank);
 	}
 
 	@Override
-	public String removeBank() {
+	public String removeBank(String key) {
 
-		Integer accountNumber = getCurrentCustomersWallet().getBank().getAccountNumber();
+		Integer accountNumber = getCurrentLoginUser.getCurrentUserWallet(key).getBank().getAccountNumber();
 		
 		Optional<Bank> optBank = bankDAO.findById(accountNumber);
 		
@@ -97,9 +76,9 @@ public class WalletServicesImpl implements WalletService{
 	}
 
 	@Override
-	public double showBankBalance() {
+	public double showBankBalance(String key) {
 		
-		Integer accountNumber = getCurrentCustomersWallet().getBank().getAccountNumber();
+		Integer accountNumber = getCurrentLoginUser.getCurrentUserWallet(key).getBank().getAccountNumber();
 
 		Optional<Bank> optBank = bankDAO.findById(accountNumber);
 		
@@ -111,9 +90,9 @@ public class WalletServicesImpl implements WalletService{
 	}
 	
 	@Override
-	public double showWalletBalance() throws NotFoundException {
+	public double showWalletBalance(String key) throws NotFoundException {
 
-		Double balance = getCurrentCustomersWallet().getWalletBalance();
+		Double balance = getCurrentLoginUser.getCurrentUserWallet(key).getWalletBalance();
 		
 		return balance;
 	}
@@ -122,9 +101,9 @@ public class WalletServicesImpl implements WalletService{
  //transaction module completed 
 	@Override
 	@Transactional
-	public String fundTransterFromWalletToWallet(FundTransferDTO fundTransferDTO) {
+	public String fundTransterFromWalletToWallet(FundTransferDTO fundTransferDTO, String key) {
 		
-		Wallet sourceWallet = getCurrentCustomersWallet();
+		Wallet sourceWallet = getCurrentLoginUser.getCurrentUserWallet(key);
 		
 		if(sourceWallet.getWalletBalance() < fundTransferDTO.getAmount()) {
 			throw new InsufficientAmountException("Insufficient balance in wallet");
@@ -158,9 +137,9 @@ public class WalletServicesImpl implements WalletService{
 
 	@Override
 	@Transactional
-	public String depositAmount(Double amount) {
+	public String depositAmount(Double amount, String key) {
 		
-		Wallet wallet = getCurrentCustomersWallet();
+		Wallet wallet = getCurrentLoginUser.getCurrentUserWallet(key);
 		
 		if(wallet.getWalletBalance() < amount) {
 			throw new InsufficientAmountException("Insufficient amount in wallet");
@@ -187,9 +166,9 @@ public class WalletServicesImpl implements WalletService{
 
 	@Override
 	@Transactional
-	public String addMoney(Double amount) {
+	public String addMoney(Double amount, String key) {
 		
-		Wallet wallet = getCurrentCustomersWallet();
+		Wallet wallet = getCurrentLoginUser.getCurrentUserWallet(key);
 		
 		Bank bank = wallet.getBank();
 		
