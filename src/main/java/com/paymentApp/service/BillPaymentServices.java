@@ -6,9 +6,9 @@ import com.paymentApp.module.BillPayment;
 
 public interface BillPaymentServices {
 
-	public String electricityBillPayment(BillPayment billPayment);
+	public String electricityBillPayment();
 	
-	public String mobileRechargeBillPayment(BillPayment billPayment);
+	public String mobileRechargeBillPayment();
 	
 	public List<BillPayment> viewBillPayment();
 }

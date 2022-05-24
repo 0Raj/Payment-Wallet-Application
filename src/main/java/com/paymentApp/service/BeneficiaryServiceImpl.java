@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.paymentApp.exceptions.BeneficiaryAlreadyExists;
 import com.paymentApp.exceptions.NotFoundException;
-import com.paymentApp.exceptions.UserAlreadyExistWithMobileNumber;
-import com.paymentApp.exceptions.UserNotFoundException;
 import com.paymentApp.module.Beneficiary;
 import com.paymentApp.module.CurrentUserSession;
 import com.paymentApp.module.Customer;
@@ -34,20 +32,31 @@ public class BeneficiaryServiceImpl implements BeneficiaryService{
 	@Autowired
 	private BeneficiaryDAO beneficiaryDAO;
 	
+	// to get wallet of customer which is currently logged in;
+	private Wallet getCurrentCustomersWallet() {
+		
+		List<CurrentUserSession> list = sessionDAO.findAll();
+		
+		CurrentUserSession currentUserSession =  list.get(0);
+		
+		Integer id = currentUserSession.getCustomerId();
+		
+		Customer customer = customerDAO.getById(id);
+		
+		Wallet wallet = customer.getWallet();
+		
+		return wallet;
+		
+	}
 	
 	@Override
 	public String addBeneficiary(Beneficiary beneficiary) throws NotFoundException , BeneficiaryAlreadyExists{
 		
-		List<CurrentUserSession> list = sessionDAO.findAll();
-		CurrentUserSession currentUserSession =  list.get(0);
-		Integer id = currentUserSession.getCustomerId();
-		
-		Customer customer = customerDAO.getById(id);
-		Wallet wallet = customer.getWallet();
+		Wallet wallet = getCurrentCustomersWallet();
 		
 		Optional<Customer> opt = customerDAO.findByMobileNo(beneficiary.getMobileNumber());
 	
-		if(!opt.isPresent()||!opt.get().getName().equals(beneficiary.getName())) {
+		if(!opt.isPresent()) {
 			throw new NotFoundException("Customer does not exists...");
 		}
 		
@@ -69,9 +78,7 @@ public class BeneficiaryServiceImpl implements BeneficiaryService{
 	@Override
 	public String deleteBeneficiary(Beneficiary beneficiary) throws NotFoundException {
 		
-		Customer customer = customerDAO.getById(sessionDAO.findAll().get(0).getCustomerId());
-		
-		Wallet wallet = customer.getWallet();
+		Wallet wallet = getCurrentCustomersWallet();
 		
 		List<Beneficiary> beneficiaryList = wallet.getBeneficiary();
 		

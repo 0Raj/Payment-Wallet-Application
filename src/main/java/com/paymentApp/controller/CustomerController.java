@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.paymentApp.module.Customer;
 import com.paymentApp.module.CustomerDTO;
 import com.paymentApp.service.CustomerServiceImpl;
-import com.paymentApp.service.CustomerValidation;
+import com.paymentApp.service.CustomerLogIn;
 
 @RestController
 public class CustomerController {
@@ -21,7 +21,7 @@ public class CustomerController {
 	private CustomerServiceImpl customerServiceImpl;
 	
 	@Autowired
-	private CustomerValidation customerValidation;
+	private CustomerLogIn customerLogIn;
 	
 	// to register user
 	@PostMapping(value = "/customer")
@@ -34,13 +34,13 @@ public class CustomerController {
 	// for user verification
 	@PostMapping(value = "/login")
 	public String logInCustomer(@Valid @RequestBody CustomerDTO customerDTO) {
-		return customerValidation.logIntoAccount(customerDTO);
+		return customerLogIn.logIntoAccount(customerDTO);
 	}
 	
 	// for user verification
 		@PatchMapping(value = "/logout")
 		public String logOutCustomer() {
-			return customerValidation.logOutFromAccount();
+			return customerLogIn.logOutFromAccount();
 		}
 
 }

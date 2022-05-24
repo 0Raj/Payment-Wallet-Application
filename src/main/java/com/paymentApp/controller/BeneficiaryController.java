@@ -19,27 +19,36 @@ public class BeneficiaryController {
 	@Autowired
 	private BeneficiaryServiceImpl beneficiaryServiceImpl;
 	
-//	Add Beneficiary to Wallet
+//	Add Beneficiary to Wallet by passing this object
+//	{
+//		"name":"Jay",
+//		"mobileNumber":"9981595557"
+//	}
 	@PostMapping(value = "/beneficiary")
 	public String addBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary) {
 		return beneficiaryServiceImpl.addBeneficiary(beneficiary);
 	}
 	
-//	Delete Beneficiary to from wallet
+//	Delete Beneficiary to from wallet by passing this object
+//	{
+//	"name":"Jay",
+//	"mobileNumber":"9981595557"
+//}
 	@DeleteMapping(value = "/beneficiary")
 	public String deleteBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary) {
 		return beneficiaryServiceImpl.deleteBeneficiary(beneficiary);
 	}	
 	
-//	Add Beneficiary to Wallet
+//	Get Beneficiary to Wallet
+//	By passing mobile number
 	@GetMapping(value = "/beneficiary")
 	public Beneficiary viewBeneficiaryInMyWallet(@PathVariable String mbilNo) {
 		return beneficiaryServiceImpl.viewBeneficiary(mbilNo);
 	}
 	
-//	Add Beneficiary to Wallet
+//	Get All Beneficiaries to Wallet
 	@GetMapping(value = "/beneficiaries")
-	public List<Beneficiary> getAllBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary) {
+	public List<Beneficiary> getAllBeneficiaryInMyWallet() {
 		return beneficiaryServiceImpl.getAllBeneficiary();
 	}
 	

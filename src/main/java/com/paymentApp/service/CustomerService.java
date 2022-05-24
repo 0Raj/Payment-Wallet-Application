@@ -1,7 +1,6 @@
 package com.paymentApp.service;
 
 import com.paymentApp.exceptions.NotFoundException;
-import com.paymentApp.exceptions.UserNotFoundException;
 import com.paymentApp.module.Customer;
 
 public interface CustomerService {

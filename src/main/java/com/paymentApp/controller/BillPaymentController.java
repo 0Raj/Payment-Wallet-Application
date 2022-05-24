@@ -19,14 +19,14 @@ public class BillPaymentController {
 
 //	To Pay electricity Bill
 	@PostMapping("/electricity")
-	public String payElectricityBill(@RequestBody BillPayment billPayment) {
-		return billPaymentServicesImpl.electricityBillPayment(billPayment);
+	public String payElectricityBill() {
+		return billPaymentServicesImpl.electricityBillPayment();
 	}
 	
-//	To recharge mobile phones
+//	To recharges mobile phone
 	@PostMapping("/recharge")
-	public String mobileRechargeBillPayment(@RequestBody BillPayment billPayment) {
-		return billPaymentServicesImpl.mobileRechargeBillPayment(billPayment);
+	public String mobileRechargeBillPayment() {
+		return billPaymentServicesImpl.mobileRechargeBillPayment();
 	}
 	
 //	To get all bill payments

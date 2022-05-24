@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.paymentApp.exceptions.InvalidPasswordException;
-import com.paymentApp.exceptions.UserNotFoundException;
+import com.paymentApp.exceptions.NotFoundException;
 import com.paymentApp.module.CurrentUserSession;
 import com.paymentApp.module.Customer;
 import com.paymentApp.module.CustomerDTO;
@@ -14,7 +14,7 @@ import com.paymentApp.repository.CustomerDAO;
 import com.paymentApp.repository.SessionDAO;
 
 @Service
-public class CustomerValidationImpl implements CustomerValidation{
+public class CustomerLogInImpl implements CustomerLogIn{
 
 	@Autowired
 	private CustomerDAO customerDAO;
@@ -28,15 +28,16 @@ public class CustomerValidationImpl implements CustomerValidation{
 		Optional<Customer> opt = customerDAO.findByMobileNo(customerDTO.getMobileNo());
 		
 		if(!opt.isPresent()) {
-			throw new UserNotFoundException("Please Enter Valid Mobile Number");
+			throw new NotFoundException("Please Enter Valid Mobile Number");
 		}
 		Customer newCustomer = opt.get();
 		if(newCustomer.getPassword().equals(customerDTO.getPassword())) {
 			
-			CurrentUserSession currentUserSession = new CurrentUserSession();
+			CurrentUserSession currentUserSession = new CurrentUserSession(); 
 			
 			currentUserSession.setCustomerId(newCustomer.getCustomerId());
-			
+		
+			// or make it for 2 user
 			sessionDAO.save(currentUserSession);
 			
 			return "Log in Sucessfull";

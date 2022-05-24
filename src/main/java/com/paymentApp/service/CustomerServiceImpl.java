@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.paymentApp.exceptions.NotFoundException;
 import com.paymentApp.exceptions.UserAlreadyExistWithMobileNumber;
-import com.paymentApp.exceptions.UserNotFoundException;
 import com.paymentApp.module.CurrentUserSession;
 import com.paymentApp.module.Customer;
 import com.paymentApp.module.Wallet;
@@ -76,11 +75,7 @@ public class CustomerServiceImpl implements CustomerService{
 	@Override
 	public Customer getCustomerDetails() {
 		
-		List<CurrentUserSession> list = sessionDAO.findAll();
-		
-		CurrentUserSession currentUserSession =  list.get(0);
-		
-		Integer id = currentUserSession.getCustomerId();
+		Integer id = sessionDAO.findAll().get(0).getCustomerId();
 		
 		Optional<Customer> customer = customerDAO.findById(id) ;
 		

@@ -38,58 +38,79 @@ public class BillPaymentServicesImpl implements BillPaymentServices{
 	@Autowired
 	private TransactionDAO transactionDAO;
 
-	@Override
-	public String electricityBillPayment(BillPayment billPayment) {
+// to get wallet of customer which is currently logged in;
+	private Wallet getCurrentCustomersWallet() {
+		
 		List<CurrentUserSession> list = sessionDAO.findAll();
-		Integer id = list.get(0).getCustomerId();
 		
-		Wallet wallet = customerDAO.getById(id).getWallet();
+		CurrentUserSession currentUserSession =  list.get(0);
 		
-		if(wallet.getWalletBalance() < billPayment.getAmount()) {
+		Integer id = currentUserSession.getCustomerId();
+		
+		Customer customer = customerDAO.getById(id);
+		
+		Wallet wallet = customer.getWallet();
+		
+		return wallet;
+		
+	}
+		
+	
+	@Override
+	public String electricityBillPayment() {
+		
+		Wallet wallet = getCurrentCustomersWallet();
+		
+		double amount = 50*((int) Math.random()+1);
+		
+		if(wallet.getWalletBalance() <= amount) {
 			throw new InsufficientAmountException("Insufficient amount in wallet");
 		}
 		
-		BillPayment billPayment2 = new BillPayment(BillType.ELECTRICITY_BILL, billPayment.getAmount(),LocalDateTime.now(), wallet.getWalletId());
-		wallet.setWalletBalance(wallet.getWalletBalance() - billPayment.getAmount());
-		Transaction myTransaction = new Transaction(TransactionType.WALLET_TO_ELECTRICITY_BILL, LocalDateTime.now(), billPayment.getAmount(), "Electricity bill is paid from wallet", wallet.getWalletId());
+		BillPayment billPayment2 = new BillPayment(BillType.ELECTRICITY_BILL, amount,LocalDateTime.now(), wallet.getWalletId());
+		
+		wallet.setWalletBalance(wallet.getWalletBalance() - amount);
+		
+		Transaction myTransaction = new Transaction(TransactionType.WALLET_TO_ELECTRICITY_BILL, LocalDateTime.now(), amount, "Electricity bill is paid from wallet", wallet.getWalletId());
 		
 		transactionDAO.save(myTransaction);
 		
 		walletDAO.save(wallet);
+		
 		billPaymentDAO.save(billPayment2);
 
-		return "Electricity bill paid successfully";
+		return "Electricity bill of Rs : " + amount + " is paid successfully";
 	}
 
 	@Override
-	public String mobileRechargeBillPayment(BillPayment billPayment) {
-		List<CurrentUserSession> list = sessionDAO.findAll();
-		Integer id = list.get(0).getCustomerId();
+	public String mobileRechargeBillPayment() {
+
+		Wallet wallet = getCurrentCustomersWallet();
 		
-		Wallet wallet = customerDAO.getById(id).getWallet();
+		double amount = 50*((int) Math.random()+1);
 		
-		if(wallet.getWalletBalance() < billPayment.getAmount()) {
+		if(wallet.getWalletBalance() < amount) {
 			throw new InsufficientAmountException("Insufficient amount in wallet");
 		}
 		
-		BillPayment billPayment2 = new BillPayment(BillType.MOBILE_RECHARGE, billPayment.getAmount(),LocalDateTime.now(), wallet.getWalletId());
-		wallet.setWalletBalance(wallet.getWalletBalance() - billPayment.getAmount());
-		Transaction myTransaction = new Transaction(TransactionType.WALLET_TO_MOBILE_RECHARGE, LocalDateTime.now(), billPayment.getAmount(), "Mobile is recharged from wallet", wallet.getWalletId());
+		BillPayment billPayment2 = new BillPayment(BillType.MOBILE_RECHARGE, amount,LocalDateTime.now(), wallet.getWalletId());
+		wallet.setWalletBalance(wallet.getWalletBalance() - amount);
+		
+		Transaction myTransaction = new Transaction(TransactionType.WALLET_TO_MOBILE_RECHARGE, LocalDateTime.now(), amount, "Mobile is recharged from wallet", wallet.getWalletId());
 		
 		transactionDAO.save(myTransaction);
 		
 		walletDAO.save(wallet);
+		
 		billPaymentDAO.save(billPayment2);
 
-		return "Mobile recharge is done successfully";
+		return "Mobile recharge of Rs : " + amount + " is done successfully";
 	}
 
 	@Override
 	public List<BillPayment> viewBillPayment() {
-		List<CurrentUserSession> list = sessionDAO.findAll();
-		Integer id = list.get(0).getCustomerId();
-		
-		Wallet wallet = customerDAO.getById(id).getWallet();
+
+		Wallet wallet = getCurrentCustomersWallet();
 		
 		List<BillPayment> list2 = billPaymentDAO.findAllBillPaymentsByWalletId(wallet.getWalletId());
 		

@@ -13,15 +13,6 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 	
-	@ExceptionHandler(UserNotFoundException.class)
-	public ResponseEntity<MyErrorMessage> handleCustomerNameException(UserNotFoundException iun,WebRequest req){
-		
-		MyErrorMessage message = new MyErrorMessage(LocalDateTime.now(),iun.getMessage(),req.getDescription(false));
-		
-		return new ResponseEntity<MyErrorMessage>(message,HttpStatus.BAD_REQUEST);
-		
-	}
-	
 	@ExceptionHandler(InvalidPasswordException.class)
 	public ResponseEntity<MyErrorMessage> handleCustomerPasswordException(InvalidPasswordException iun,WebRequest req){
 		
@@ -49,23 +40,6 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(err,HttpStatus.BAD_REQUEST);
 	}
 		
-	@ExceptionHandler(WalletNotFoundException.class)
-	public ResponseEntity<MyErrorMessage> handleWalletNotFountException(WalletNotFoundException iun,WebRequest req){
-		
-		MyErrorMessage message = new MyErrorMessage(LocalDateTime.now(),iun.getMessage(),req.getDescription(false));
-		
-		return new ResponseEntity<MyErrorMessage>(message,HttpStatus.BAD_REQUEST);
-		
-	}
-	
-	@ExceptionHandler(AccountNotFoundException.class)
-	public ResponseEntity<MyErrorMessage> handleAccountNotFountException(AccountNotFoundException iun,WebRequest req){
-		
-		MyErrorMessage message = new MyErrorMessage(LocalDateTime.now(),iun.getMessage(),req.getDescription(false));
-		
-		return new ResponseEntity<MyErrorMessage>(message,HttpStatus.BAD_REQUEST);
-		
-	}
 	
 	@ExceptionHandler(UserAlreadyExistWithMobileNumber.class)
 	public ResponseEntity<MyErrorMessage> handleUserAlreadyExistWithMobileNumber(UserAlreadyExistWithMobileNumber uae,WebRequest req){
