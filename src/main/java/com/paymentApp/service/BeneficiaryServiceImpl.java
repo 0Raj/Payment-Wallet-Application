@@ -15,11 +15,6 @@ import com.paymentApp.module.Wallet;
 import com.paymentApp.repository.BeneficiaryDAO;
 import com.paymentApp.repository.CustomerDAO;
 import com.paymentApp.repository.WalletDAO;
-<<<<<<< Updated upstream
-import com.paymentApp.util.GetCurrentLoginUserSessionDetails;
-=======
-import com.paymentApp.util.GetCurrentLoginUserSessionDetailsImpl;
->>>>>>> Stashed changes
 
 @Service
 public class BeneficiaryServiceImpl implements BeneficiaryService{
@@ -34,20 +29,7 @@ public class BeneficiaryServiceImpl implements BeneficiaryService{
 	private BeneficiaryDAO beneficiaryDAO;
 	
 	@Autowired
-<<<<<<< Updated upstream
-	private GetCurrentLoginUserSessionDetails getCurrentLoginUser;
-	
-	
-	// to get wallet of customer which is currently logged in;
-	private Wallet getCurrentCustomersWallet(String key) {
-		
-		Wallet wallet = getCurrentLoginUser.getCurrentUserWallet(key);
-		return wallet;
-	}
-=======
 	private GetCurrentLoginUserSessionDetailsImpl getCurrentLoginUser;
-	
->>>>>>> Stashed changes
 	
 	@Override
 	public String addBeneficiary(Beneficiary beneficiary, String key) throws NotFoundException , BeneficiaryAlreadyExists{
