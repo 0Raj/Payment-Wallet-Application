@@ -1,6 +1,7 @@
 package com.paymentApp;
 
 import org.springframework.boot.SpringApplication;
+
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -19,11 +20,8 @@ public class PaymentWalletApplication {
 	// For validation
 	@Bean
 	public LocalValidatorFactoryBean validator(MessageSource ms) {
-		
 		LocalValidatorFactoryBean lvfb=new LocalValidatorFactoryBean();
-		
 		lvfb.setValidationMessageSource(ms);
-		
 		return lvfb;
 	}
 

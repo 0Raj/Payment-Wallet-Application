@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddMoneyToWalletOrBankDTO {
+public class AmountDTO {
 
 	private Double amount;
 }

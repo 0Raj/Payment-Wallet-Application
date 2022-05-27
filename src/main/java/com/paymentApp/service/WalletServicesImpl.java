@@ -19,7 +19,11 @@ import com.paymentApp.repository.BankDAO;
 import com.paymentApp.repository.CustomerDAO;
 import com.paymentApp.repository.TransactionDAO;
 import com.paymentApp.repository.WalletDAO;
+<<<<<<< Updated upstream
 import com.paymentApp.util.GetCurrentLoginUserSessionDetails;
+=======
+import com.paymentApp.util.GetCurrentLoginUserSessionDetailsImpl;
+>>>>>>> Stashed changes
 
 @Service
 public class WalletServicesImpl implements WalletService{
@@ -37,7 +41,11 @@ public class WalletServicesImpl implements WalletService{
 	private TransactionDAO transactionDAO;
 	
 	@Autowired
+<<<<<<< Updated upstream
 	private GetCurrentLoginUserSessionDetails getCurrentLoginUser;
+=======
+	private GetCurrentLoginUserSessionDetailsImpl getCurrentLoginUser;
+>>>>>>> Stashed changes
 		
 	@Override
 	public Bank addBank(Bank bank, String key) { 
@@ -171,6 +179,10 @@ public class WalletServicesImpl implements WalletService{
 		Wallet wallet = getCurrentLoginUser.getCurrentUserWallet(key);
 		
 		Bank bank = wallet.getBank();
+		
+		if(bank == null) {
+			throw new NotFoundException("No bank is linked with this account");
+		}
 		
 		if(bank.getBankBalance() < amount) {
 			throw new InsufficientAmountException("Insufficient amount in your bank");
