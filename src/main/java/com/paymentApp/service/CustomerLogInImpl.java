@@ -1,12 +1,6 @@
 package com.paymentApp.service;
 
 import java.time.LocalDateTime;
-<<<<<<< Updated upstream
-import java.util.Optional;
-import java.util.UUID;
-=======
->>>>>>> Stashed changes
-
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,13 +13,9 @@ import com.paymentApp.module.Customer;
 import com.paymentApp.module.CustomerDTO;
 import com.paymentApp.repository.CustomerDAO;
 import com.paymentApp.repository.SessionDAO;
-<<<<<<< Updated upstream
-import com.paymentApp.util.GetCurrentLoginUserSessionDetails;
-=======
 import com.paymentApp.util.GetCurrentLoginUserSessionDetailsImpl;
 
 import net.bytebuddy.utility.RandomString;
->>>>>>> Stashed changes
 
 @Service
 public class CustomerLogInImpl implements CustomerLogIn{
@@ -37,11 +27,7 @@ public class CustomerLogInImpl implements CustomerLogIn{
 	private SessionDAO sessionDAO;
 	
 	@Autowired
-<<<<<<< Updated upstream
-	private GetCurrentLoginUserSessionDetails getCurrentLoginUser;
-=======
 	private GetCurrentLoginUserSessionDetailsImpl getCurrentLoginUser;
->>>>>>> Stashed changes
 	
 	@Override
 	public String logIntoAccount(CustomerDTO customerDTO) {
@@ -62,13 +48,8 @@ public class CustomerLogInImpl implements CustomerLogIn{
 		}
 		
 		if(newCustomer.getPassword().equals(customerDTO.getPassword())) {
-			String key = UUID.randomUUID().toString();
-			
-<<<<<<< Updated upstream
-=======
 			String key = RandomString.make(6);
 			
->>>>>>> Stashed changes
 			CurrentUserSession currentUserSession = new CurrentUserSession(newCustomer.getCustomerId(), key, LocalDateTime.now());			
 			sessionDAO.save(currentUserSession);
 
@@ -81,15 +62,12 @@ public class CustomerLogInImpl implements CustomerLogIn{
 
 	@Override
 	public String logOutFromAccount(String key) {
-<<<<<<< Updated upstream
-=======
 		
 		Optional<CurrentUserSession> currentUserOptional = sessionDAO.findByUuid(key);
 		
 		if(!currentUserOptional.isPresent()) {
 			throw new NotFoundException("User is not logged in with this number");
 		}
->>>>>>> Stashed changes
 		
 		CurrentUserSession currentUserSession = getCurrentLoginUser.getCurrentUserSession(key);
 		sessionDAO.delete(currentUserSession);
