@@ -12,11 +12,8 @@ import com.paymentApp.module.CurrentUserSession;
 @Repository
 public interface SessionDAO extends JpaRepository<CurrentUserSession, Id>{
 	
-<<<<<<< Updated upstream
 	public  Optional<CurrentUserSession> findByUuid(String uuid);
-=======
+
 	public Optional<CurrentUserSession> findByCustomerId(Integer customerId);
-	
-	public Optional<CurrentUserSession> findByUuid(String uuid);
->>>>>>> Stashed changes
+
 }
