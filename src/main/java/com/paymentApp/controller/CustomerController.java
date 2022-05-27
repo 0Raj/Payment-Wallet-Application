@@ -43,26 +43,11 @@ public class CustomerController {
 	public Customer deleteCustomer(@RequestParam(required = false) String key) {
 		return customerServiceImpl.deleteCustomer(key);
 	}
-	
-<<<<<<< Updated upstream
-	// for user Login
-	@PostMapping(value = "/login")
-	public String logInCustomer(@Valid @RequestBody CustomerDTO customerDTO) {
-		return customerLogIn.logIntoAccount(customerDTO);
-	}
-	
-	// for user Logout
-	@PatchMapping(value = "/logout/{key}")
-	public String logOutCustomer(@PathVariable("key") String key) {
-		return customerLogIn.logOutFromAccount(key);
-	}
 
-=======
-	// To update existing user details by passing its login key
+	// To get customer details by key
 	@GetMapping(value = "/customer")
 	public Customer getCustomerDetails(@RequestParam(required = false) String key) {
 		return customerServiceImpl.getCustomerDetails(key);
 	}
-	
->>>>>>> Stashed changes
+
 }
