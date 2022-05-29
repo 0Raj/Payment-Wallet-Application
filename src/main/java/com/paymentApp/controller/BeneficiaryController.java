@@ -25,6 +25,7 @@ public class BeneficiaryController {
 //		"name":"Jay",
 //		"mobileNumber":"9981595557"
 //	}
+
 	@PostMapping(value = "/beneficiary")
 	public String addBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary, @RequestParam(required = false) String key) {
 		return beneficiaryServiceImpl.addBeneficiary(beneficiary, key);
@@ -35,6 +36,7 @@ public class BeneficiaryController {
 //	"name":"Jay",
 //	"mobileNumber":"9981595557"
 //}
+
 	@DeleteMapping(value = "/beneficiary")
 	public String deleteBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary, @RequestParam(required = false) String key) {
 		return beneficiaryServiceImpl.deleteBeneficiary(beneficiary, key);
@@ -42,6 +44,7 @@ public class BeneficiaryController {
 	
 //	Get Beneficiary to Wallet
 //	By passing mobile number
+
 	@GetMapping(value = "/beneficiary")
 	public Beneficiary viewBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary,@RequestParam(required = false) String key) {
 		return beneficiaryServiceImpl.viewBeneficiary(beneficiary.getMobileNumber(), key);

@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.paymentApp.exceptions.NotFoundException;
 import com.paymentApp.exceptions.UserAlreadyExistWithMobileNumber;
 import com.paymentApp.module.Customer;
 import com.paymentApp.module.Wallet;

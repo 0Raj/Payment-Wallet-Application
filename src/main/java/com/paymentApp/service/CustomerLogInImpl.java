@@ -1,7 +1,6 @@
 package com.paymentApp.service;
 
 import java.time.LocalDateTime;
-
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +33,11 @@ public class CustomerLogInImpl implements CustomerLogIn{
 	public String logIntoAccount(CustomerDTO customerDTO) {
 		
 		Optional<Customer> opt = customerDAO.findByMobileNo(customerDTO.getMobileNo());
+		Customer newCustomer = opt.get();
+		
+		Integer customerId = newCustomer.getCustomerId();
+		
+		Optional<CurrentUserSession> currentUserOptional = sessionDAO.findByCustomerId(customerId);
 		
 		if(!opt.isPresent()) {
 			throw new NotFoundException("Please Enter Valid Mobile Number");
