@@ -11,5 +11,5 @@ public interface BeneficiaryDAO extends JpaRepository<Beneficiary, Integer>{
 	
 	public Optional<Beneficiary>  findByMobileNumber(String mobileNumber);
 	
-//	public List<Beneficiary> findAllBeneficiariesByWalletId(Integer id);
+	public List<Beneficiary> findByWalletId(Integer id);
 }

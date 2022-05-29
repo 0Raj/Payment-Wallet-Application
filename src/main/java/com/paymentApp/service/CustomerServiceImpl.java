@@ -1,6 +1,5 @@
 package com.paymentApp.service;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,11 +7,10 @@ import org.springframework.stereotype.Service;
 
 import com.paymentApp.exceptions.NotFoundException;
 import com.paymentApp.exceptions.UserAlreadyExistWithMobileNumber;
-import com.paymentApp.module.CurrentUserSession;
 import com.paymentApp.module.Customer;
 import com.paymentApp.module.Wallet;
 import com.paymentApp.repository.CustomerDAO;
-import com.paymentApp.repository.SessionDAO;
+import com.paymentApp.util.GetCurrentLoginUserSessionDetailsImpl;
 
 @Service
 public class CustomerServiceImpl implements CustomerService{
@@ -21,7 +19,7 @@ public class CustomerServiceImpl implements CustomerService{
 	private CustomerDAO customerDAO;
 	
 	@Autowired
-	private SessionDAO sessionDAO;
+	private GetCurrentLoginUserSessionDetailsImpl getCurrentLoginUser;
 	
 	@Override
 	public Customer createCustomer(Customer customer) {
@@ -42,44 +40,32 @@ public class CustomerServiceImpl implements CustomerService{
 	}
 
 	@Override
-	public Customer updateCustomer(Customer customer) throws NotFoundException {
+	public Customer updateCustomer(Customer customer, String key) {
 		
-		Optional<Customer> optional = customerDAO.findById(customer.getCustomerId());
+		Customer customer2 = getCurrentLoginUser.getCurrentCustomer(key);
 		
-		if(optional.isPresent()) {
-			customerDAO.save(customer);
-		}
-		else {
-			throw new NotFoundException("User Does not exist");
+		if(customer2 == null) {
+			throw new NotFoundException("No user found.. try login first");
 		}
 		
+		customerDAO.save(customer);
 		return customer;
 	}
 
 	@Override
-	public Customer deleteCustomer() {
+	public Customer deleteCustomer(String key) {
 		
-		List<CurrentUserSession> list = sessionDAO.findAll();
-		
-		CurrentUserSession currentUserSession =  list.get(0);
-		
-		Integer id = currentUserSession.getCustomerId();
-		
-		Optional<Customer> customer = customerDAO.findById(id) ;
-		
-		customerDAO.delete(customer.get());
-		
-		return customer.get();
+		Customer customer = getCurrentLoginUser.getCurrentCustomer(key);		
+		customerDAO.delete(customer);
+		return customer;
 	}
 
 	@Override
-	public Customer getCustomerDetails() {
+	public Customer getCustomerDetails(String key) {
 		
-		Integer id = sessionDAO.findAll().get(0).getCustomerId();
-		
-		Optional<Customer> customer = customerDAO.findById(id) ;
-		
-		return customer.get();
+		Customer customer = getCurrentLoginUser.getCurrentCustomer(key);	
+		System.out.println(customer);
+		return customer;
 	}
 
 }

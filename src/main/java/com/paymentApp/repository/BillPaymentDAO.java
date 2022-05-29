@@ -9,5 +9,6 @@ import com.paymentApp.module.BillPayment;
 public interface BillPaymentDAO extends JpaRepository<BillPayment, Integer>{
 
 	public List<BillPayment> findAllBillPaymentsByWalletId(Integer id);
+
 }
 

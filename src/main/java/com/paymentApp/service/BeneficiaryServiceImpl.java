@@ -1,6 +1,7 @@
 package com.paymentApp.service;
 
 import java.util.List;
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,13 +10,12 @@ import org.springframework.stereotype.Service;
 import com.paymentApp.exceptions.BeneficiaryAlreadyExists;
 import com.paymentApp.exceptions.NotFoundException;
 import com.paymentApp.module.Beneficiary;
-import com.paymentApp.module.CurrentUserSession;
 import com.paymentApp.module.Customer;
 import com.paymentApp.module.Wallet;
 import com.paymentApp.repository.BeneficiaryDAO;
 import com.paymentApp.repository.CustomerDAO;
-import com.paymentApp.repository.SessionDAO;
 import com.paymentApp.repository.WalletDAO;
+import com.paymentApp.util.GetCurrentLoginUserSessionDetailsImpl;
 
 @Service
 public class BeneficiaryServiceImpl implements BeneficiaryService{
@@ -24,35 +24,19 @@ public class BeneficiaryServiceImpl implements BeneficiaryService{
 	private CustomerDAO customerDAO;
 	
 	@Autowired
-	private SessionDAO sessionDAO;
-	
-	@Autowired
 	private WalletDAO walletDAO;
 	
 	@Autowired
 	private BeneficiaryDAO beneficiaryDAO;
 	
-	// to get wallet of customer which is currently logged in;
-	private Wallet getCurrentCustomersWallet() {
-		
-		List<CurrentUserSession> list = sessionDAO.findAll();
-		
-		CurrentUserSession currentUserSession =  list.get(0);
-		
-		Integer id = currentUserSession.getCustomerId();
-		
-		Customer customer = customerDAO.getById(id);
-		
-		Wallet wallet = customer.getWallet();
-		
-		return wallet;
-		
-	}
+	@Autowired
+	private GetCurrentLoginUserSessionDetailsImpl getCurrentLoginUser;
+	
 	
 	@Override
-	public String addBeneficiary(Beneficiary beneficiary) throws NotFoundException , BeneficiaryAlreadyExists{
+	public String addBeneficiary(Beneficiary beneficiary, String key){
 		
-		Wallet wallet = getCurrentCustomersWallet();
+		Wallet wallet = getCurrentLoginUser.getCurrentUserWallet(key);
 		
 		Optional<Customer> opt = customerDAO.findByMobileNo(beneficiary.getMobileNumber());
 	
@@ -76,9 +60,9 @@ public class BeneficiaryServiceImpl implements BeneficiaryService{
 	}
 
 	@Override
-	public String deleteBeneficiary(Beneficiary beneficiary) throws NotFoundException {
+	public String deleteBeneficiary(Beneficiary beneficiary, String key){
 		
-		Wallet wallet = getCurrentCustomersWallet();
+		Wallet wallet = getCurrentLoginUser.getCurrentUserWallet(key);
 		
 		List<Beneficiary> beneficiaryList = wallet.getBeneficiary();
 		
@@ -99,7 +83,7 @@ public class BeneficiaryServiceImpl implements BeneficiaryService{
 	}
 
 	@Override
-	public Beneficiary viewBeneficiary(String mobileNo) throws NotFoundException {
+	public Beneficiary viewBeneficiary(String mobileNo, String key){
 		
 		Optional<Beneficiary> opt = beneficiaryDAO.findByMobileNumber(mobileNo);
 		
@@ -111,7 +95,8 @@ public class BeneficiaryServiceImpl implements BeneficiaryService{
 	}
 
 	@Override
-	public List<Beneficiary> getAllBeneficiary() throws NotFoundException{
+	public List<Beneficiary> getAllBeneficiary(String key){
+		
 		
 		List<Beneficiary> beneficiaries = beneficiaryDAO.findAll();
 		
@@ -121,6 +106,5 @@ public class BeneficiaryServiceImpl implements BeneficiaryService{
 		
 		return beneficiaries;
 	}
-	
 	
 }

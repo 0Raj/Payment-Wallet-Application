@@ -6,6 +6,6 @@ public interface CustomerLogIn {
 	
 	public String logIntoAccount(CustomerDTO customerDTO);
 	
-	public String logOutFromAccount();
+	public String logOutFromAccount(String key);
 
 }

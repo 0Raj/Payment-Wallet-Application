@@ -1,7 +1,6 @@
 package com.paymentApp.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.paymentApp.exceptions.InsufficientAmountException;
 import com.paymentApp.exceptions.NotFoundException;
 import com.paymentApp.module.Bank;
-import com.paymentApp.module.CurrentUserSession;
 import com.paymentApp.module.Customer;
 import com.paymentApp.module.FundTransferDTO;
 import com.paymentApp.module.Transaction;
@@ -19,9 +17,9 @@ import com.paymentApp.module.TransactionType;
 import com.paymentApp.module.Wallet;
 import com.paymentApp.repository.BankDAO;
 import com.paymentApp.repository.CustomerDAO;
-import com.paymentApp.repository.SessionDAO;
 import com.paymentApp.repository.TransactionDAO;
 import com.paymentApp.repository.WalletDAO;
+import com.paymentApp.util.GetCurrentLoginUserSessionDetailsImpl;
 
 @Service
 public class WalletServicesImpl implements WalletService{
@@ -36,46 +34,27 @@ public class WalletServicesImpl implements WalletService{
 	private CustomerDAO customerDAO;
 	
 	@Autowired
-	private SessionDAO sessionDAO;
-	
-	@Autowired
 	private TransactionDAO transactionDAO;
 	
-// to get wallet of customer which is currently logged in;
-	private Wallet getCurrentCustomersWallet() {
-		
-		List<CurrentUserSession> list = sessionDAO.findAll();
-		
-		CurrentUserSession currentUserSession =  list.get(0);
-		
-		Integer id = currentUserSession.getCustomerId();
-		
-		Customer customer = customerDAO.getById(id);
-		
-		Wallet wallet = customer.getWallet();
-		
-		return wallet;
-		
-	}
+	@Autowired
+	private GetCurrentLoginUserSessionDetailsImpl getCurrentLoginUser;
 		
 	@Override
-	public Bank addBank(Bank bank) { 
+	public Bank addBank(Bank bank, String key) { 
 		
-		Wallet wallet = getCurrentCustomersWallet();
-		
+		Wallet wallet = getCurrentLoginUser.getCurrentUserWallet(key);
 		wallet.setBank(bank);
 		
 		bank.setWalletId(wallet.getWalletId());	
-		
 		walletDAO.save(wallet);
  		
 		return  bankDAO.save(bank);
 	}
 
 	@Override
-	public String removeBank() {
+	public String removeBank(String key) {
 
-		Integer accountNumber = getCurrentCustomersWallet().getBank().getAccountNumber();
+		Integer accountNumber = getCurrentLoginUser.getCurrentUserWallet(key).getBank().getAccountNumber();
 		
 		Optional<Bank> optBank = bankDAO.findById(accountNumber);
 		
@@ -97,9 +76,9 @@ public class WalletServicesImpl implements WalletService{
 	}
 
 	@Override
-	public double showBankBalance() {
+	public double showBankBalance(String key) {
 		
-		Integer accountNumber = getCurrentCustomersWallet().getBank().getAccountNumber();
+		Integer accountNumber = getCurrentLoginUser.getCurrentUserWallet(key).getBank().getAccountNumber();
 
 		Optional<Bank> optBank = bankDAO.findById(accountNumber);
 		
@@ -111,9 +90,9 @@ public class WalletServicesImpl implements WalletService{
 	}
 	
 	@Override
-	public double showWalletBalance() throws NotFoundException {
+	public double showWalletBalance(String key) throws NotFoundException {
 
-		Double balance = getCurrentCustomersWallet().getWalletBalance();
+		Double balance = getCurrentLoginUser.getCurrentUserWallet(key).getWalletBalance();
 		
 		return balance;
 	}
@@ -122,9 +101,10 @@ public class WalletServicesImpl implements WalletService{
  //transaction module completed 
 	@Override
 	@Transactional
-	public String fundTransterFromWalletToWallet(FundTransferDTO fundTransferDTO) {
+	public String fundTransterFromWalletToWallet(FundTransferDTO fundTransferDTO, String key) {
 		
-		Wallet sourceWallet = getCurrentCustomersWallet();
+		Wallet sourceWallet = getCurrentLoginUser.getCurrentUserWallet(key);
+		Customer sourceCustomer = getCurrentLoginUser.getCurrentCustomer(key);
 		
 		if(sourceWallet.getWalletBalance() < fundTransferDTO.getAmount()) {
 			throw new InsufficientAmountException("Insufficient balance in wallet");
@@ -144,23 +124,26 @@ public class WalletServicesImpl implements WalletService{
 		sourceWallet.setWalletBalance(sourceWallet.getWalletBalance() - fundTransferDTO.getAmount());
 		targetWallet.setWalletBalance(targetWallet.getWalletBalance() + fundTransferDTO.getAmount());
 		
+		Transaction sourceTransaction = new Transaction(TransactionType.WALLET_TO_WALLET_FUND_TRANSFER, LocalDateTime.now(), fundTransferDTO.getAmount(), fundTransferDTO.getAmount()+  " Rupees is sent to "+targetCustomer.getMobileNo() + " sucessfully...");
+		Transaction targetTransaction = new Transaction(TransactionType.WALLET_TO_WALLET_FUND_TRANSFER, LocalDateTime.now(), fundTransferDTO.getAmount(), fundTransferDTO.getAmount()+  " Rupees is received from "+sourceCustomer.getMobileNo() + " sucessfully...");
+
+		
+		sourceWallet.getTransactions().add(sourceTransaction);
+		targetWallet.getTransactions().add(targetTransaction);
+		
+		transactionDAO.save(sourceTransaction);
+		transactionDAO.save(targetTransaction);
 		walletDAO.save(sourceWallet);
 		walletDAO.save(targetWallet);
 		
-		String description =fundTransferDTO.getAmount()+  " Rupees is transerfered to "+targetCustomer.getMobileNo() + " sucessfully..."; 
-		
-		Transaction myTransaction = new Transaction(TransactionType.WALLET_TO_WALLET_FUND_TRANSFER, LocalDateTime.now(), fundTransferDTO.getAmount(), description, sourceWallet.getWalletId());
-		
-		transactionDAO.save(myTransaction);
-		
-		return description;
+		return fundTransferDTO.getAmount()+  " Rupees is sent to "+targetCustomer.getMobileNo() + " sucessfully...";
 	}
 
 	@Override
 	@Transactional
-	public String depositAmount(Double amount) {
+	public String depositAmount(Double amount, String key) {
 		
-		Wallet wallet = getCurrentCustomersWallet();
+		Wallet wallet = getCurrentLoginUser.getCurrentUserWallet(key);
 		
 		if(wallet.getWalletBalance() < amount) {
 			throw new InsufficientAmountException("Insufficient amount in wallet");
@@ -174,12 +157,12 @@ public class WalletServicesImpl implements WalletService{
 
 		bankDAO.save(bank);
 		
-		String description = amount+" is credited to your account";
+		String description = amount+" is deposited to your bank account";
 		
-		Transaction myTransaction = new Transaction(TransactionType.WALLET_TO_ACCOUNT, LocalDateTime.now(),amount, description, wallet.getWalletId());
+		Transaction myTransaction = new Transaction(TransactionType.WALLET_TO_ACCOUNT, LocalDateTime.now(),amount, description);
+		wallet.getTransactions().add(myTransaction);
 		
 		transactionDAO.save(myTransaction);
-		
 		return description;
 		
 	}
@@ -187,11 +170,15 @@ public class WalletServicesImpl implements WalletService{
 
 	@Override
 	@Transactional
-	public String addMoney(Double amount) {
+	public String addMoney(Double amount, String key) {
 		
-		Wallet wallet = getCurrentCustomersWallet();
+		Wallet wallet = getCurrentLoginUser.getCurrentUserWallet(key);
 		
 		Bank bank = wallet.getBank();
+		
+		if(bank == null) {
+			throw new NotFoundException("No bank is linked with this account");
+		}
 		
 		if(bank.getBankBalance() < amount) {
 			throw new InsufficientAmountException("Insufficient amount in your bank");
@@ -204,7 +191,8 @@ public class WalletServicesImpl implements WalletService{
 		bankDAO.save(bank);
 		walletDAO.save(wallet);	
 		
-		Transaction myTransaction = new Transaction(TransactionType.WALLET_TO_ACCOUNT, LocalDateTime.now(), amount, amount+" is credited to your wallet", wallet.getWalletId());
+		Transaction myTransaction = new Transaction(TransactionType.WALLET_TO_ACCOUNT, LocalDateTime.now(), amount, amount+" is credited in your wallet");
+		wallet.getTransactions().add(myTransaction);
 		
 		transactionDAO.save(myTransaction);
 		

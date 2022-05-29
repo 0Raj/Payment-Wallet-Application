@@ -23,6 +23,8 @@ public class Beneficiary {
 	private String name;
 	
 	private String mobileNumber;
+	
+	private Integer walletId;
 
 	public Beneficiary(String name, String mobileNumber) {
 		super();

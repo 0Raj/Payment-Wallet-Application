@@ -31,13 +31,12 @@ public class Transaction {
 	private Integer walletId;
 
 	public Transaction(TransactionType transactionType, LocalDateTime transactionDate, double amount,
-			String description, Integer walletId) {
+			String description) {
 		super();
 		this.transactionType = transactionType;
 		this.transactionDate = transactionDate;
 		this.amount = amount;
 		this.description = description;
-		this.walletId = walletId;
 	}
 
 }

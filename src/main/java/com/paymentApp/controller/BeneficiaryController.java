@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.paymentApp.module.Beneficiary;
@@ -25,8 +26,8 @@ public class BeneficiaryController {
 //		"mobileNumber":"9981595557"
 //	}
 	@PostMapping(value = "/beneficiary")
-	public String addBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary) {
-		return beneficiaryServiceImpl.addBeneficiary(beneficiary);
+	public String addBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary, @RequestParam(required = false) String key) {
+		return beneficiaryServiceImpl.addBeneficiary(beneficiary, key);
 	}
 	
 //	Delete Beneficiary to from wallet by passing this object
@@ -35,21 +36,21 @@ public class BeneficiaryController {
 //	"mobileNumber":"9981595557"
 //}
 	@DeleteMapping(value = "/beneficiary")
-	public String deleteBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary) {
-		return beneficiaryServiceImpl.deleteBeneficiary(beneficiary);
+	public String deleteBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary, @RequestParam(required = false) String key) {
+		return beneficiaryServiceImpl.deleteBeneficiary(beneficiary, key);
 	}	
 	
 //	Get Beneficiary to Wallet
 //	By passing mobile number
 	@GetMapping(value = "/beneficiary")
-	public Beneficiary viewBeneficiaryInMyWallet(@PathVariable String mbilNo) {
-		return beneficiaryServiceImpl.viewBeneficiary(mbilNo);
+	public Beneficiary viewBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary,@RequestParam(required = false) String key) {
+		return beneficiaryServiceImpl.viewBeneficiary(beneficiary.getMobileNumber(), key);
 	}
 	
 //	Get All Beneficiaries to Wallet
 	@GetMapping(value = "/beneficiaries")
-	public List<Beneficiary> getAllBeneficiaryInMyWallet() {
-		return beneficiaryServiceImpl.getAllBeneficiary();
+	public List<Beneficiary> getAllBeneficiaryInMyWallet( @RequestParam(required = false) String key) {
+		return beneficiaryServiceImpl.getAllBeneficiary(key);
 	}
 	
 }
