@@ -9,5 +9,6 @@ import com.paymentApp.module.Customer;
 public interface CustomerDAO extends JpaRepository<Customer, Integer>{
 	
 	public Optional<Customer> findByMobileNo(String mobileNo);
+	public Optional<Customer> findByCustomerId(Integer customerId);
 	
 }

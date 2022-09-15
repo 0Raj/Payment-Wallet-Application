@@ -8,19 +8,19 @@ import com.paymentApp.module.FundTransferDTO;
 
 public interface WalletService {
 	
-	public Bank addBank(Bank bank, String key) ;
+	public Bank addBank(Bank bank) ;
 	
-	public String removeBank(String key) throws NotFoundException;
+	public String removeBank() throws NotFoundException;
 	
-	public double showBankBalance(String key) throws NotFoundException;
+	public double showBankBalance() throws NotFoundException;
 	
-	public double showWalletBalance(String key) throws NotFoundException;
+	public double showWalletBalance() throws NotFoundException;
 	
-	public String fundTransterFromWalletToWallet(FundTransferDTO fundTransferDTO, String key) throws InsufficientAmountException;
+	public String fundTransterFromWalletToWallet(FundTransferDTO fundTransferDTO) throws InsufficientAmountException;
 	
-	public String depositAmount(Double amount, String key) throws InsufficientAmountException;
+	public String depositAmount(Double amount) throws InsufficientAmountException;
 	
-	public String addMoney(Double amount, String key) throws InsufficientAmountException;
+	public String addMoney(Double amount) throws InsufficientAmountException;
 	
 	
 }

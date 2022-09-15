@@ -23,44 +23,44 @@ public class WalletController {
 	
 //	Add a Bank to wallet
 	@PostMapping("/bank")
-	public Bank addBankToWallet(@Valid @RequestBody Bank bank, @RequestParam(required = false) String key) {
-		return walletServicesImpl.addBank(bank, key);
+	public Bank addBankToWallet(@Valid @RequestBody Bank bank) {
+		return walletServicesImpl.addBank(bank);
 	}
 	
 //	Delete a Bank from wallet
 	@DeleteMapping("/bank")
-	public String deleteBankStringAccount(@RequestParam(required = false) String key) {
-		return walletServicesImpl.removeBank(key);
+	public String deleteBankStringAccount() {
+		return walletServicesImpl.removeBank();
 	}
 	
 //	Get the Bank balance
 	@GetMapping("/bankbalance")
-	public double showBankBalance( @RequestParam(required = false) String key) {
-		return walletServicesImpl.showBankBalance(key);
+	public double showBankBalance() {
+		return walletServicesImpl.showBankBalance();
 	}
 	
 //	Get the Wallet balance
 	@GetMapping("/walletbalance")
-	public double showWalletBalance( @RequestParam(required = false) String key) {
-		return walletServicesImpl.showWalletBalance(key);
+	public double showWalletBalance() {
+		return walletServicesImpl.showWalletBalance();
 	}
 	
 //	Fund transfer from source mobile to target mobile
 	@PostMapping("/transfer")
-	public String fundTransferToWallet(@RequestBody FundTransferDTO fundTransferDTO, @RequestParam(required = false) String key) {
-		return walletServicesImpl.fundTransterFromWalletToWallet(fundTransferDTO, key);
+	public String fundTransferToWallet(@RequestBody FundTransferDTO fundTransferDTO) {
+		return walletServicesImpl.fundTransterFromWalletToWallet(fundTransferDTO);
 	}
 	
 //	Add money from bank to wallet
 	@PostMapping(value = "/addmoney")
-	public String addMoneyToWalletFromBank(@RequestBody AmountDTO addMoneyToWalletOrBankDTO, @RequestParam(required = false) String key) {
-		return walletServicesImpl.addMoney(addMoneyToWalletOrBankDTO.getAmount(), key);
+	public String addMoneyToWalletFromBank(@RequestBody AmountDTO addMoneyToWalletOrBankDTO) {
+		return walletServicesImpl.addMoney(addMoneyToWalletOrBankDTO.getAmount());
 	}
 	
 //	Deposit money to bank from wallet
 	@PostMapping(value = "/deposit")
-	public String depositMoneyToBankFromWallet(@RequestBody AmountDTO addMoneyToWalletOrBankDTO, @RequestParam(required = false) String key) {
-		return walletServicesImpl.depositAmount(addMoneyToWalletOrBankDTO.getAmount(), key);
+	public String depositMoneyToBankFromWallet(@RequestBody AmountDTO addMoneyToWalletOrBankDTO) {
+		return walletServicesImpl.depositAmount(addMoneyToWalletOrBankDTO.getAmount());
 	}
 	
 

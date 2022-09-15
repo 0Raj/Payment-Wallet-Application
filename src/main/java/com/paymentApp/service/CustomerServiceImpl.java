@@ -2,7 +2,9 @@ package com.paymentApp.service;
 
 import java.util.Optional;
 
+import com.paymentApp.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.paymentApp.exceptions.UserAlreadyExistWithMobileNumber;
@@ -13,6 +15,8 @@ import com.paymentApp.util.GetCurrentLoginUserSessionDetailsImpl;
 
 @Service
 public class CustomerServiceImpl implements CustomerService{
+	@Autowired
+	PasswordEncoder passwordEncoder;
 
 	@Autowired
 	private CustomerDAO customerDAO;
@@ -34,6 +38,7 @@ public class CustomerServiceImpl implements CustomerService{
 		wallet.setCustomer(customer);
 		
 		customer.setWallet(wallet);
+		customer.setPassword(passwordEncoder.encode(customer.getPassword()));
 		
 		return  customerDAO.save(customer);
 	}

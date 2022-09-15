@@ -30,15 +30,30 @@ public class Customer {
 	@Size(min=10,max=10,message = "{moblie.invalid}")
 	private String mobileNo;
 	
-	@Pattern(regexp="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,12}$",message = "{password.invalid}") 
+	//@Pattern(regexp="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,100}$",message = "{password.invalid}")
 	private String password;
 	
 	@Email(message = "{email.invalid}")
 	@NotBlank
 	private String email;
-	
+
+	@NotBlank
+	private String role;
+
 	@JsonIgnore
 	@OneToOne(optional = false, cascade = CascadeType.ALL)
 	private Wallet wallet;
-	
+
+	@Override
+	public String toString() {
+		return "Customer{" +
+				"customerId=" + customerId +
+				", name='" + name + '\'' +
+				", mobileNo='" + mobileNo + '\'' +
+				", password='" + password + '\'' +
+				", email='" + email + '\'' +
+				", role='" + role + '\'' +
+				", wallet=" + wallet +
+				'}';
+	}
 }

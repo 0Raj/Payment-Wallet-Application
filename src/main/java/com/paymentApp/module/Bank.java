@@ -12,6 +12,9 @@ public class Bank {
 	
 	@Id
 	private Integer accountNumber;
+
+	@NotNull
+	private String mobileNumber;
 	
 	@NotNull
 	private String ifscCode;

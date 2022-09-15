@@ -43,5 +43,7 @@ public class Wallet {
 	@OneToMany
 	@JoinColumn(name = "walletId", referencedColumnName = "walletId")
 	private List<Transaction> transactions;
+
+
 		
 }

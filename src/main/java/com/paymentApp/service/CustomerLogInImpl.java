@@ -33,12 +33,12 @@ public class CustomerLogInImpl implements CustomerLogIn{
 	public String logIntoAccount(CustomerDTO customerDTO) {
 		
 		Optional<Customer> opt = customerDAO.findByMobileNo(customerDTO.getMobileNo());
-		Customer newCustomer = opt.get();
-		
-		Integer customerId = newCustomer.getCustomerId();
-		
-		Optional<CurrentUserSession> currentUserOptional = sessionDAO.findByCustomerId(customerId);
-		
+//		Customer newCustomer = opt.get();
+//
+//		Integer customerId = newCustomer.getCustomerId();
+//
+//		Optional<CurrentUserSession> currentUserOptional = sessionDAO.findByCustomerId(customerId);
+//
 		if(!opt.isPresent()) {
 			throw new NotFoundException("Please Enter Valid Mobile Number");
 		}
