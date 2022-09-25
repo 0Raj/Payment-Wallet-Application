@@ -6,8 +6,6 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,20 +29,20 @@ public class CustomerController {
 	
 	// To update existing user details by passing its login key
 	@PutMapping(value = "/customer")
-	public Customer updateCustomer(@Valid @RequestBody Customer customer, @RequestParam(required = false) String key) {
-		return customerServiceImpl.updateCustomer(customer, key);
+	public Customer updateCustomer(@Valid @RequestBody Customer customer) {
+		return customerServiceImpl.updateCustomer(customer);
 	}
 	
 	// To delete existing user details by passing its login key
 	@DeleteMapping(value = "/customer")
-	public Customer deleteCustomer(@RequestParam(required = false) String key) {
-		return customerServiceImpl.deleteCustomer(key);
+	public Customer deleteCustomer() {
+		return customerServiceImpl.deleteCustomer();
 	}
 	
 	// To get details of current user by passing its login key
 	@GetMapping(value = "/customer")
-	public Customer getCustomerDetails(@RequestParam(required = false) String key) {
-		return customerServiceImpl.getCustomerDetails(key);
+	public Customer getCustomerDetails() {
+		return customerServiceImpl.getCustomerDetails();
 	}
 	
 }

@@ -2,6 +2,8 @@ package com.paymentApp.security;
 
 
 import com.paymentApp.module.Customer;
+import com.paymentApp.repository.CustomerRepository;
+import com.paymentApp.repository.WalletDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

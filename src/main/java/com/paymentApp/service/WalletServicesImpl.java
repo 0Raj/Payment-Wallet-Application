@@ -3,10 +3,7 @@ package com.paymentApp.service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import com.paymentApp.security.SecurityCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,63 +20,58 @@ import com.paymentApp.repository.BankDAO;
 import com.paymentApp.repository.CustomerDAO;
 import com.paymentApp.repository.TransactionDAO;
 import com.paymentApp.repository.WalletDAO;
-import com.paymentApp.util.GetCurrentLoginUserSessionDetailsImpl;
+import com.paymentApp.util.GetCurrentLoginUserDetails;
 
 @Service
-public class WalletServicesImpl implements WalletService{
+public class WalletServicesImpl implements WalletService {
 
 	@Autowired
 	private BankDAO bankDAO;
-	
+
 	@Autowired
 	private WalletDAO walletDAO;
-	
+
 	@Autowired
 	private CustomerDAO customerDAO;
 
-	
 	@Autowired
 	private TransactionDAO transactionDAO;
 
-		
+	@Autowired
+	private GetCurrentLoginUserDetails getCurrentLoginUserDetails;
+
 	@Override
 	public Bank addBank(Bank bank) {
 
 		Optional<Customer> optionalCustomer = customerDAO.findByMobileNo(bank.getMobileNumber());
 
-		if(!optionalCustomer.isPresent()){
+		if (!optionalCustomer.isPresent()) {
 			throw new NotFoundException("Please Enter Mobile number attached with your wallet");
 		}
 
 		Customer customer = optionalCustomer.get();
 
-
 		Optional<Wallet> optionalWallet = walletDAO.findById(customer.getWallet().getWalletId());
 
 		Wallet wallet = optionalWallet.get();
 
-
 		wallet.setBank(bank);
 
-		bank.setWalletId(wallet.getWalletId());	
+		bank.setWalletId(wallet.getWalletId());
 		walletDAO.save(wallet);
 
-
- 		
-		return  bankDAO.save(bank);
+		return bankDAO.save(bank);
 	}
 
 	@Override
 	public String removeBank() {
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-		if (principal instanceof UserDetails) {
-			String username = ((UserDetails)principal).getUsername();
-			SecurityCustomer customer = (SecurityCustomer)principal;
+		if (getCurrentLoginUserDetails.checkLogin()) {
 
-			Wallet wallet =	customer.getWallet();
+			Customer customer = getCurrentLoginUserDetails.getCurrentCustomer();
+			Wallet wallet = customer.getWallet();
 
-			Optional<Bank> optBank = bankDAO.findByMobileNumber(customer.getMobileNumber());
+			Optional<Bank> optBank = bankDAO.findByMobileNumber(customer.getMobileNo());
 
 			wallet.setBank(null);
 
@@ -87,80 +79,68 @@ public class WalletServicesImpl implements WalletService{
 
 			bankDAO.delete(optBank.get());
 
-
-			return  "Bank is deleted sucessfully";
+			return "Bank is deleted sucessfully";
 		} else {
-			String username = principal.toString();
-			System.out.println(username);
 
-			return  "Bank is Not deleted sucessfully";
+			return "Bank is Not deleted sucessfully";
 		}
-
-		
 
 	}
 
 	@Override
 	public double showBankBalance() {
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-		if(principal instanceof UserDetails){
+		if (getCurrentLoginUserDetails.checkLogin()) {
 
-			SecurityCustomer customer = (SecurityCustomer)principal;
+			Customer customer = getCurrentLoginUserDetails.getCurrentCustomer();
 
-			Optional<Bank> optBank = bankDAO.findByMobileNumber(customer.getMobileNumber());
+			Optional<Bank> optBank = bankDAO.findByMobileNumber(customer.getMobileNo());
 
-			if(!optBank.isPresent()) {
+			if (!optBank.isPresent()) {
 				throw new NotFoundException("Account is not found");
 			}
 			return optBank.get().getBankBalance();
 
-		}else {
+		} else {
 			throw new UsernameNotFoundException("Please Login First");
 		}
 
-
 	}
-	
+
 	@Override
 	public double showWalletBalance() throws NotFoundException {
 
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (getCurrentLoginUserDetails.checkLogin()) {
 
-		if(principal instanceof UserDetails){
-
-			SecurityCustomer customer = (SecurityCustomer)principal;
-
+			Customer customer = getCurrentLoginUserDetails.getCurrentCustomer();
 			return customer.getWallet().getWalletBalance();
 
-		}else {
+		} else {
 			throw new UsernameNotFoundException("Please Login First");
 		}
 
 	}
-	
-	
- //transaction module completed 
+
+	// transaction module completed
 	@Override
 	@Transactional
-	public String fundTransterFromWalletToWallet(FundTransferDTO fundTransferDTO)  {
+	public String fundTransterFromWalletToWallet(FundTransferDTO fundTransferDTO) {
 
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (getCurrentLoginUserDetails.checkLogin()) {
 
-		if(principal instanceof UserDetails) {
-			SecurityCustomer sourceCustomer = (SecurityCustomer) principal;
+			Customer customer = getCurrentLoginUserDetails.getCurrentCustomer();
 
-			Optional<Wallet> optionalWallet = walletDAO.findById(sourceCustomer.getWallet().getWalletId());
+			Optional<Wallet> optionalWallet = walletDAO.findById(customer.getWallet().getWalletId());
 
 			Wallet sourceWallet = optionalWallet.get();
 
-			if(sourceWallet.getWalletBalance() < fundTransferDTO.getAmount()) {
+			if (sourceWallet.getWalletBalance() < fundTransferDTO.getAmount()) {
 				throw new InsufficientAmountException("Insufficient balance in wallet");
 			}
 
 			Optional<Customer> optTargetCustomer = customerDAO.findByMobileNo(fundTransferDTO.getTargetMobileNo());
 
-			if(!optTargetCustomer.isPresent()) {
+			if (!optTargetCustomer.isPresent()) {
 				throw new NotFoundException("Target user mobile number not valid");
 			}
 
@@ -173,16 +153,12 @@ public class WalletServicesImpl implements WalletService{
 			targetWallet.setWalletBalance(targetWallet.getWalletBalance() + fundTransferDTO.getAmount());
 
 			Transaction sourceTransaction = new Transaction(TransactionType.WALLET_TO_WALLET_FUND_TRANSFER,
-					LocalDateTime.now(), fundTransferDTO.getAmount(),
-					fundTransferDTO.getAmount()+  " Rupees is sent to "
-							+targetCustomer.getMobileNo() + " sucessfully...");
-
+					LocalDateTime.now(), fundTransferDTO.getAmount(), fundTransferDTO.getAmount()
+							+ " Rupees is sent to " + targetCustomer.getMobileNo() + " sucessfully...");
 
 			Transaction targetTransaction = new Transaction(TransactionType.WALLET_TO_WALLET_FUND_TRANSFER,
-					LocalDateTime.now(), fundTransferDTO.getAmount(),
-					fundTransferDTO.getAmount()+  " Rupees is received from "
-							+sourceCustomer.getMobileNumber() + " sucessfully...");
-
+					LocalDateTime.now(), fundTransferDTO.getAmount(), fundTransferDTO.getAmount()
+							+ " Rupees is received from " + customer.getMobileNo() + " sucessfully...");
 
 			sourceWallet.getTransactions().add(sourceTransaction);
 			targetWallet.getTransactions().add(targetTransaction);
@@ -192,12 +168,12 @@ public class WalletServicesImpl implements WalletService{
 			walletDAO.save(sourceWallet);
 			walletDAO.save(targetWallet);
 
-			return fundTransferDTO.getAmount()+  " Rupees is sent to "+targetCustomer.getMobileNo() + " sucessfully...";
+			return fundTransferDTO.getAmount() + " Rupees is sent to " + targetCustomer.getMobileNo()
+					+ " sucessfully...";
 
-		}else {
+		} else {
 			throw new NotFoundException("Please Login First");
 		}
-
 
 	}
 
@@ -205,16 +181,15 @@ public class WalletServicesImpl implements WalletService{
 	@Transactional
 	public String depositAmount(Double amount) {
 
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (getCurrentLoginUserDetails.checkLogin()) {
 
-		if(principal instanceof UserDetails) {
-			SecurityCustomer customer = (SecurityCustomer) principal;
+			Customer customer = getCurrentLoginUserDetails.getCurrentCustomer();
 
 			Optional<Wallet> optionalWallet = walletDAO.findById(customer.getWallet().getWalletId());
 
 			Wallet wallet = optionalWallet.get();
 
-			if(wallet.getWalletBalance() < amount) {
+			if (wallet.getWalletBalance() < amount) {
 				throw new InsufficientAmountException("Insufficient amount in wallet");
 			}
 
@@ -226,30 +201,28 @@ public class WalletServicesImpl implements WalletService{
 
 			bankDAO.save(bank);
 
-			String description = amount+" is deposited to your bank account";
+			String description = amount + " is deposited to your bank account";
 
-			Transaction myTransaction = new Transaction(TransactionType.WALLET_TO_ACCOUNT, LocalDateTime.now(),amount, description);
+			Transaction myTransaction = new Transaction(TransactionType.WALLET_TO_ACCOUNT, LocalDateTime.now(), amount,
+					description);
 			wallet.getTransactions().add(myTransaction);
 
 			transactionDAO.save(myTransaction);
 			return description;
 
-		}else {
+		} else {
 			throw new NotFoundException("Please Login First");
 		}
 
-		
 	}
-	
 
 	@Override
 	@Transactional
 	public String addMoney(Double amount) {
 
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (getCurrentLoginUserDetails.checkLogin()) {
 
-		if(principal instanceof UserDetails){
-			SecurityCustomer customer = (SecurityCustomer)principal;
+			Customer customer = getCurrentLoginUserDetails.getCurrentCustomer();
 
 			Optional<Wallet> optionalWallet = walletDAO.findById(customer.getWallet().getWalletId());
 
@@ -257,11 +230,11 @@ public class WalletServicesImpl implements WalletService{
 
 			Bank bank = wallet.getBank();
 
-			if(bank == null) {
+			if (bank == null) {
 				throw new NotFoundException("No bank is linked with this account");
 			}
 
-			if(bank.getBankBalance() < amount) {
+			if (bank.getBankBalance() < amount) {
 				throw new InsufficientAmountException("Insufficient amount in your bank");
 			}
 
@@ -272,24 +245,17 @@ public class WalletServicesImpl implements WalletService{
 			bankDAO.save(bank);
 			walletDAO.save(wallet);
 
-			Transaction myTransaction = new Transaction(TransactionType.WALLET_TO_ACCOUNT, LocalDateTime.now(), amount, amount+" is credited in your wallet");
+			Transaction myTransaction = new Transaction(TransactionType.WALLET_TO_ACCOUNT, LocalDateTime.now(), amount,
+					amount + " is credited in your wallet");
 			wallet.getTransactions().add(myTransaction);
 
 			transactionDAO.save(myTransaction);
 
-			return amount+" is credited to your wallet";
+			return amount + " is credited to your wallet";
 
-		}else {
+		} else {
 			throw new NotFoundException("Please Login First");
 		}
-		
-
-
-		
-
-		
-
-		
 
 	}
 }

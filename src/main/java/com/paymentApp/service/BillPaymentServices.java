@@ -6,11 +6,11 @@ import com.paymentApp.module.Transaction;
 
 public interface BillPaymentServices {
 
-	public String electricityBillPayment(Double amount , String key);
+	public String electricityBillPayment(Double amount);
 	
-	public String mobileRechargeBillPayment(Double amount , String key);
+	public String mobileRechargeBillPayment(Double amount);
 	
-	public List<BillPayment> viewBillPayment(String key);
+	public List<BillPayment> viewBillPayment();
 	
-	public List<Transaction> getAllTransactions(String key);
+	public List<Transaction> getAllTransactions();
 }

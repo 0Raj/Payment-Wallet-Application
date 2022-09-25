@@ -24,25 +24,25 @@ public class BillPaymentController {
 
 //	To Pay electricity Bill
 	@PostMapping("/electricity")
-	public String payElectricityBill(@Valid @RequestBody AmountDTO amountDTO , @RequestParam(required = false) String key) {
-		return billPaymentServicesImpl.electricityBillPayment(amountDTO.getAmount() , key);
+	public String payElectricityBill(@Valid @RequestBody AmountDTO amountDTO ) {
+		return billPaymentServicesImpl.electricityBillPayment(amountDTO.getAmount());
 	}
 	
 //	To recharges mobile phone
 	@PostMapping("/recharge")
-	public String mobileRechargeBillPayment(@Valid @RequestBody AmountDTO amountDTO ,@RequestParam(required = false) String key) {
-		return billPaymentServicesImpl.mobileRechargeBillPayment(amountDTO.getAmount() , key);
+	public String mobileRechargeBillPayment(@Valid @RequestBody AmountDTO amountDTO ) {
+		return billPaymentServicesImpl.mobileRechargeBillPayment(amountDTO.getAmount());
 	}
 	
 //	To get all bill payments
 	@GetMapping("/bills")
-	public List<BillPayment> getAllBillPayments(@RequestParam(required = false) String key) {
-		return billPaymentServicesImpl.viewBillPayment(key);
+	public List<BillPayment> getAllBillPayments() {
+		return billPaymentServicesImpl.viewBillPayment();
 	}
 	
 //	Get all transaction history
 	@GetMapping("/transactions")
-	public List<Transaction> getAllTransactions(@RequestParam(required = false) String key) {
-		return billPaymentServicesImpl.getAllTransactions(key);
+	public List<Transaction> getAllTransactions() {
+		return billPaymentServicesImpl.getAllTransactions();
 	}
 }

@@ -8,11 +8,11 @@ import com.paymentApp.module.Beneficiary;
 
 public interface BeneficiaryService {
 	
-	public String addBeneficiary(Beneficiary beneficiary, String key) throws NotFoundException , BeneficiaryAlreadyExists  ;
+	public String addBeneficiary(Beneficiary beneficiary) throws NotFoundException , BeneficiaryAlreadyExists  ;
 	
-	public String deleteBeneficiary(Beneficiary beneficiary, String key) throws NotFoundException;
+	public String deleteBeneficiary(Beneficiary beneficiary) throws NotFoundException;
 	
-	public Beneficiary viewBeneficiary(String mobileNo, String key) throws NotFoundException;
+	public Beneficiary viewBeneficiary(String mobileNo) throws NotFoundException;
 	
-	public List<Beneficiary> getAllBeneficiary(String key) throws NotFoundException;
+	public List<Beneficiary> getAllBeneficiary() throws NotFoundException;
 }

@@ -16,10 +16,10 @@ import com.paymentApp.service.BeneficiaryServiceImpl;
 
 @RestController
 public class BeneficiaryController {
-	
+
 	@Autowired
 	private BeneficiaryServiceImpl beneficiaryServiceImpl;
-	
+
 //	Add Beneficiary to Wallet by passing this object
 //	{
 //		"name":"Jay",
@@ -27,10 +27,10 @@ public class BeneficiaryController {
 //	}
 
 	@PostMapping(value = "/beneficiary")
-	public String addBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary, @RequestParam(required = false) String key) {
-		return beneficiaryServiceImpl.addBeneficiary(beneficiary, key);
+	public String addBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary) {
+		return beneficiaryServiceImpl.addBeneficiary(beneficiary);
 	}
-	
+
 //	Delete Beneficiary to from wallet by passing this object
 //	{
 //	"name":"Jay",
@@ -38,22 +38,22 @@ public class BeneficiaryController {
 //}
 
 	@DeleteMapping(value = "/beneficiary")
-	public String deleteBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary, @RequestParam(required = false) String key) {
-		return beneficiaryServiceImpl.deleteBeneficiary(beneficiary, key);
-	}	
-	
+	public String deleteBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary) {
+		return beneficiaryServiceImpl.deleteBeneficiary(beneficiary);
+	}
+
 //	Get Beneficiary to Wallet
 //	By passing mobile number
 
 	@GetMapping(value = "/beneficiary")
-	public Beneficiary viewBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary,@RequestParam(required = false) String key) {
-		return beneficiaryServiceImpl.viewBeneficiary(beneficiary.getMobileNumber(), key);
+	public Beneficiary viewBeneficiaryInMyWallet(@RequestBody Beneficiary beneficiary) {
+		return beneficiaryServiceImpl.viewBeneficiary(beneficiary.getMobileNumber());
 	}
-	
+
 //	Get All Beneficiaries to Wallet
 	@GetMapping(value = "/beneficiaries")
-	public List<Beneficiary> getAllBeneficiaryInMyWallet( @RequestParam(required = false) String key) {
-		return beneficiaryServiceImpl.getAllBeneficiary(key);
+	public List<Beneficiary> getAllBeneficiaryInMyWallet() {
+		return beneficiaryServiceImpl.getAllBeneficiary();
 	}
-	
+
 }
