@@ -41,6 +41,7 @@ ONLINE WALLET PAYMENT APP | Online Wallet Payment Application where you can send
 - **Spring**
 - **Spring Boot**
 - **Spring data JPA**
+- **Spring security**
 - **Hibernate**
 - **MySQL**
 
